@@ -108,4 +108,53 @@ router.post(
       .catch(err => res.json(err));
   }
 );
+
+router.post(
+  "/comment/:post_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Post.findById(req.params.post_id)
+      .then(post => {
+        let { errors, isValid } = postValidator(req.body);
+        if (!isValid) {
+          return res.status(400).json(errors);
+        }
+
+        const newComment = {
+          text: req.body.text,
+          name: req.body.name,
+          avatar: req.body.avatar,
+          user: req.user.id
+        };
+        post.comments.unshift(newComment);
+        post.save().then(post => res.json(post));
+      })
+      .catch(err => res.status(404).json({ postnotfound: "Post not found" }));
+  }
+);
+
+router.delete(
+  "/comment/:post_id/:comment_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Post.findById(req.params.post_id)
+      .then(post => {
+        // let { errors, isValid } = postValidator(req.body);
+        // if (!isValid) {
+        //   return res.status(400).json(errors);
+        // }
+
+        const indexOfCommentToRemove = post.comments
+          .map(comment => comment._id.toString())
+          .indexOf(req.params.comment_id);
+
+        post.comments.splice(indexOfCommentToRemove, 1);
+
+        post.save().then(post => res.json(post));
+      })
+      .catch(err =>
+        res.status(404).json({ postnotfound: "Comment not found" })
+      );
+  }
+);
 module.exports = router;
