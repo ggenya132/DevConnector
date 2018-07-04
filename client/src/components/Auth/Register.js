@@ -43,7 +43,10 @@ class Register extends Component {
   //       this causes bugs because the context of this referring to the class is not perserved, therefore we need to bind this in the constructor
   //     this.setState({ [e.target.name]: e.target.value });
   //   }
-
+  onFocus() {
+    console.log("FOCUSED!");
+    console.log(this);
+  }
   render() {
     const { errors } = this.state;
 
@@ -59,6 +62,7 @@ class Register extends Component {
               <form onSubmit={this.onSubmit}>
                 <div className="form-group">
                   <input
+                    onFocus={this.onFocus}
                     type="text"
                     className={classnames("form-control form-control-lg", {
                       "is-invalid": errors.name
