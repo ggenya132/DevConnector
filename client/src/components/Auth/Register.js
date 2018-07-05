@@ -1,6 +1,9 @@
 import React, { Component } from "react";
-import axios from "axios";
+import PropTypes from "prop-types";
+
 import classnames from "classnames";
+import { connect } from "react-redux";
+import { registerUser } from "../../actions/authActions";
 class Register extends Component {
   constructor() {
     super();
@@ -21,6 +24,13 @@ class Register extends Component {
     // this.onChange = this.onChange.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
+  }
+
   //alt: onChange = e => this.setState({ [e.target.name]: e.target.value })
   //this works because this in trad func scope points to containing object...since this is class
   onSubmit = e => {
@@ -32,11 +42,11 @@ class Register extends Component {
       password2: this.state.password2
     };
     console.log(newUser);
-
-    axios
-      .post("/api/users/register", newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({ errors: err.response.data }));
+    this.props.registerUser(newUser);
+    // axios
+    //   .post("/api/users/register", newUser)
+    //   .then(res => console.log(res.data))
+    //   .catch(err => this.setState({ errors: err.response.data }));
   };
   onChange = e => this.setState({ [e.target.name]: e.target.value });
   //   onChange(e) {
@@ -135,4 +145,18 @@ class Register extends Component {
   }
 }
 
-export default Register;
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  mapStateToProps,
+  { registerUser }
+)(Register);
