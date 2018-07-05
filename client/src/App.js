@@ -5,9 +5,21 @@ import Landing from "./components/Landing";
 import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import { Provider } from "react-redux";
+import jwt_decode from "jwt-decode";
+import setAuthToken from "./utils/setAuthToken";
+import { setCurrentUser } from "./actions/authActions";
+
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 import store from "./store";
+
+if (localStorage.jwtToken) {
+  // SET auth token header auth
+  setAuthToken(localStorage.jwtToken);
+  // Decode token and get user info and exp
+  const decodedUserData = jwt_decode(localStorage.jwtToken);
+  store.dispatch(setCurrentUser(decodedUserData));
+}
 
 class App extends Component {
   render() {
